@@ -1,51 +1,57 @@
 {
-    "name": "ia-weather-integration",
-    "version": "1.0.0",
-    "description": "Integración profesional con Open-Meteo API para Node.js - Servicios de IA, bots y automatismos",
-    "main": "src/services/weatherService.js",
-    "type": "module",
-    "scripts": {
-        "example:basic": "node src/examples/basicExample.js",
-        "example:all": "node src/examples/basicExample.js",
-        "start": "node src/examples/basicExample.js",
-        "server": "node server.js",
-        "dev": "node server.js",
-        "test": "npm run test:backend && npm run test:frontend",
-        "lint": "npm run lint:backend && npm run lint:frontend",
-        "lint:backend": "npx eslint .",
-        "lint:frontend": "cd web && npx eslint .",
-        "test:backend": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-        "test:frontend": "cd web && npm test",
-        "prepare": "husky"
-    },
-    "keywords": [
-        "weather",
-        "open-meteo",
-        "api",
-        "climate",
-        "forecast",
-        "ai",
-        "bot",
-        "automation"
-    ],
-    "author": "",
-    "license": "MIT",
-    "engines": {
-        "node": ">=18.0.0"
-    },
-    "devDependencies": {
-        "@eslint/js": "^10.0.1",
-        "eslint": "^10.0.0",
-        "globals": "^17.3.0",
-        "husky": "^9.1.7",
-        "jest": "^30.2.0",
-        "supertest": "^7.2.2"
-    },
-    "jest": {
-        "testEnvironment": "node",
-        "testPathIgnorePatterns": [
-            "/node_modules/",
-            "/web/"
-        ]
-    }
+  "name": "ia-weather-integration",
+  "version": "1.0.0",
+  "description": "Integración profesional con Open-Meteo API para Node.js - Servicios de IA, bots y automatismos",
+  "main": "src/services/weatherService.js",
+  "type": "module",
+  "scripts": {
+    "example:basic": "node src/examples/basicExample.js",
+    "example:all": "node src/examples/basicExample.js",
+    "start": "node src/examples/basicExample.js",
+    "server": "node server.js",
+    "dev": "node server.js",
+    "test": "npm run test:backend && npm run test:frontend",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "npx eslint .",
+    "lint:frontend": "cd web && npx eslint .",
+    "test:backend": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:frontend": "cd web && npm test",
+    "prepare": "husky"
+  },
+  "keywords": [
+    "weather",
+    "open-meteo",
+    "api",
+    "climate",
+    "forecast",
+    "ai",
+    "bot",
+    "automation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.0",
+    "globals": "^17.3.0",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
+    "supertest": "^7.2.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/web/"
+    ]
+  },
+  "lint-staged": {
+    "*.{js,mjs,json,md,css}": "prettier --write",
+    "*.{astro}": "prettier --write"
+  }
 }
