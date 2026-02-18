@@ -13,9 +13,6 @@ describe('WeatherUtils Suite', () => {
     // -------------------------------------------------------------
     describe('getActivityRecommendations', () => {
         test('debe recomendar actividades al aire libre con buen clima', () => {
-             // ❌ ESTO ES UN ERROR INTENCIONAL PARA PROBAR EL HOOK DE GIT
-            throw new Error('FALLO DE PRUEBA INTENCIONAL PARA DEMO DE HUSKY');
-
             // Arrange
             const weatherData = {
                 current: { temperature: 20, windSpeed: 10 },
