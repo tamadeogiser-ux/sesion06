@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-echo "📢 Ejecutando pruebas automáticas antes de subir..."
+echo "📢 Verificando calidad (Linter)..."
+npm run lint
+
+echo "📢 Ejecutando pruebas automáticas..."
 npm test

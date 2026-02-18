@@ -48,7 +48,7 @@ const { title = "Weather App" } = Astro.props;
   const storedTheme = localStorage.getItem('theme');
   const initialTheme = storedTheme || (prefersDark ? 'dark' : 'light');
   
-  function setTheme(theme: string) {
+  function setTheme(theme) {
     if (theme === 'dark') {
       htmlElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
@@ -60,7 +60,7 @@ const { title = "Weather App" } = Astro.props;
     }
   }
   
-  function updateThemeIcon(isDark: boolean) {
+  function updateThemeIcon(isDark) {
     if (themeToggle) {
       const icon = themeToggle.querySelector('.theme-icon');
       if (icon) {
