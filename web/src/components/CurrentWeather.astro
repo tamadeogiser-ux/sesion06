@@ -1,0 +1,182 @@
+---
+/**
+ * Componente CurrentWeather
+ * 
+ * Tarjeta grande mostrando clima actual
+ * - Temperatura prominente
+ * - Descripción meteorológica
+ * - Sensación térmica
+ * - Viento y humedad
+ */
+
+interface Props {
+  temperature: number;
+  description: string;
+  humidity?: number;
+  windSpeed?: number;
+  feelsLike?: number;
+  weatherCode?: number;
+}
+
+const { 
+  temperature, 
+  description, 
+  humidity = 0, 
+  windSpeed = 0, 
+  feelsLike = temperature 
+} = Astro.props;
+
+// Iconos por tipo de clima
+const weatherIcons: Record<string, string> = {
+  'despejado': '☀️',
+  'nublado': '☁️',
+  'lluvia': '🌧️',
+  'nieve': '❄️',
+  'tormenta': '⛈️',
+  'niebla': '🌫️',
+  'viento': '💨',
+};
+
+function getIcon(desc: string): string {
+  const descLower = desc.toLowerCase();
+  for (const [key, icon] of Object.entries(weatherIcons)) {
+    if (descLower.includes(key)) return icon;
+  }
+  return '🌤️';
+}
+---
+
+<article class="weather-card weather-card--current">
+  <div class="weather-card__content">
+    <div class="weather-card__icon" aria-hidden="true">
+      {getIcon(description)}
+    </div>
+    
+    <div class="weather-card__main">
+      <div class="weather-card__temp">
+        {Math.round(temperature)}°C
+      </div>
+      <p class="weather-card__description">
+        {description}
+      </p>
+    </div>
+  </div>
+  
+  <div class="weather-card__details">
+    <div class="detail-item">
+      <span class="detail-item__label">Sensación</span>
+      <span class="detail-item__value">{Math.round(feelsLike)}°C</span>
+    </div>
+    
+    <div class="detail-item">
+      <span class="detail-item__label">Humedad</span>
+      <span class="detail-item__value">{humidity}%</span>
+    </div>
+    
+    <div class="detail-item">
+      <span class="detail-item__label">Viento</span>
+      <span class="detail-item__value">{windSpeed} km/h</span>
+    </div>
+  </div>
+</article>
+
+<style>
+  .weather-card {
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  
+  .weather-card--current {
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .weather-card__content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+  }
+  
+  .weather-card__icon {
+    font-size: 5rem;
+    line-height: 1;
+    min-width: 5rem;
+    text-align: center;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  .weather-card__main {
+    flex: 1;
+  }
+  
+  .weather-card__temp {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: var(--font-weight-bold);
+    line-height: 1;
+    margin-bottom: var(--space-sm);
+  }
+  
+  .weather-card__description {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    opacity: 0.95;
+  }
+  
+  .weather-card__details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: var(--space-md);
+    padding-top: var(--space-lg);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  
+  .detail-item__label {
+    font-size: var(--font-size-xs);
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: var(--font-weight-medium);
+  }
+  
+  .detail-item__value {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+  }
+  
+  @media (max-width: 640px) {
+    .weather-card {
+      padding: var(--space-md);
+    }
+    
+    .weather-card__icon {
+      font-size: 3rem;
+      min-width: 3rem;
+    }
+    
+    .weather-card__temp {
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+    }
+  }
+</style>

@@ -1,0 +1,206 @@
+---
+/**
+ * Componente ForecastCard
+ * 
+ * Tarjeta para un día de pronóstico
+ * - Temperatura máx/mín
+ * - Precipitación esperada
+ * - Icono del clima
+ * - Responsive y accesible
+ */
+
+interface Props {
+  date: string;
+  tempMax: number;
+  tempMin: number;
+  precipitation: number;
+  description?: string;
+}
+
+const { date, tempMax, tempMin, precipitation, description = "Parcialmente nublado" } = Astro.props;
+
+function formatDate(dateStr: string): string {
+  try {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('es-ES', { weekday: 'short', month: 'short', day: 'numeric' });
+  } catch {
+    return dateStr;
+  }
+}
+
+function getWeatherIcon(desc: string): string {
+  const icons: Record<string, string> = {
+    'despejado': '☀️',
+    'nublado': '☁️',
+    'lluvia': '🌧️',
+    'tormenta': '⛈️',
+    'nieve': '❄️',
+  };
+  
+  for (const [key, icon] of Object.entries(icons)) {
+    if (desc.toLowerCase().includes(key)) return icon;
+  }
+  return '🌤️';
+}
+---
+
+<article class="forecast-card card">
+  <header class="forecast-card__header">
+    <h3 class="forecast-card__date">{formatDate(date)}</h3>
+    <span class="forecast-card__icon" aria-hidden="true">
+      {getWeatherIcon(description)}
+    </span>
+  </header>
+  
+  <div class="forecast-card__body">
+    <div class="temp-range">
+      <div class="temp-item temp-item--max">
+        <span class="temp-item__label">Máx</span>
+        <span class="temp-item__value">{Math.round(tempMax)}°</span>
+      </div>
+      
+      <div class="temp-progress">
+        <div class="temp-progress__bar">
+          {tempMax > 0 && (
+            <div 
+              class="temp-progress__fill" 
+              style={`width: ${Math.min(100, (tempMax + 10) * 3.33)}%`}
+            ></div>
+          )}
+        </div>
+      </div>
+      
+      <div class="temp-item temp-item--min">
+        <span class="temp-item__label">Mín</span>
+        <span class="temp-item__value">{Math.round(tempMin)}°</span>
+      </div>
+    </div>
+    
+    {precipitation > 0 && (
+      <div class="precipitation">
+        <span class="precipitation__icon">💧</span>
+        <span class="precipitation__value">{precipitation}mm</span>
+      </div>
+    )}
+  </div>
+</article>
+
+<style>
+  .forecast-card {
+    padding: var(--space-md);
+    background-color: var(--color-bg-primary);
+  }
+  
+  .forecast-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+  }
+  
+  .forecast-card__date {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+  }
+  
+  .forecast-card__icon {
+    font-size: 1.75rem;
+  }
+  
+  .forecast-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  
+  .temp-range {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+  
+  .temp-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    min-width: 45px;
+  }
+  
+  .temp-item__label {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+  }
+  
+  .temp-item__value {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+  }
+  
+  .temp-item--max .temp-item__value {
+    color: #ef4444;
+  }
+  
+  .temp-item--min .temp-item__value {
+    color: #0284c7;
+  }
+  
+  .temp-progress {
+    flex: 1;
+    height: 4px;
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+  }
+  
+  .temp-progress__bar {
+    height: 100%;
+    background: linear-gradient(90deg, #0284c7, #ec4899, #ef4444);
+    width: 100%;
+  }
+  
+  .temp-progress__fill {
+    height: 100%;
+    background: var(--gradient-primary);
+    transition: width 300ms ease-out;
+  }
+  
+  .precipitation {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+  
+  .precipitation__icon {
+    font-size: 1rem;
+  }
+  
+  .precipitation__value {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-info);
+  }
+  
+  @media (max-width: 640px) {
+    .forecast-card {
+      padding: var(--space-sm);
+    }
+    
+    .forecast-card__date {
+      font-size: var(--font-size-xs);
+    }
+    
+    .forecast-card__icon {
+      font-size: 1.25rem;
+    }
+  }
+</style>

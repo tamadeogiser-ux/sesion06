@@ -1,0 +1,158 @@
+---
+/**
+ * Componente Header
+ * 
+ * Navegación principal con toggle de tema
+ * - Responsive (hamburger en mobile)
+ * - Dark mode toggle
+ * - Accesible (ARIA)
+ */
+interface Props {
+  title?: string;
+}
+
+const { title = "Weather App" } = Astro.props;
+---
+
+<header class="header">
+  <nav class="header__nav" aria-label="Principal">
+    <div class="header__content">
+      <h1 class="header__title">
+        <a href="/" class="header__logo">
+          🌤️ {title}
+        </a>
+      </h1>
+      
+      <div class="header__controls">
+        <button
+          id="theme-toggle"
+          class="btn btn-ghost"
+          aria-label="Cambiar tema"
+          aria-pressed="false"
+          title="Alternar modo oscuro"
+        >
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  // Toggle de tema con persistencia en localStorage
+  const themeToggle = document.getElementById('theme-toggle');
+  const htmlElement = document.documentElement;
+  
+  // Detectar preferencia inicial
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const storedTheme = localStorage.getItem('theme');
+  const initialTheme = storedTheme || (prefersDark ? 'dark' : 'light');
+  
+  function setTheme(theme: string) {
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      updateThemeIcon(true);
+    } else {
+      htmlElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      updateThemeIcon(false);
+    }
+  }
+  
+  function updateThemeIcon(isDark: boolean) {
+    if (themeToggle) {
+      const icon = themeToggle.querySelector('.theme-icon');
+      if (icon) {
+        icon.textContent = isDark ? '☀️' : '🌙';
+      }
+      themeToggle.setAttribute('aria-pressed', isDark.toString());
+    }
+  }
+  
+  // Aplicar tema inicial
+  setTheme(initialTheme);
+  
+  // Toggle al hacer click
+  themeToggle?.addEventListener('click', () => {
+    const currentTheme = htmlElement.classList.contains('dark') ? 'dark' : 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+  });
+  
+  // Sincronizar si cambia en otra pestaña
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'theme') {
+      setTheme(e.newValue || 'light');
+    }
+  });
+</script>
+
+<style>
+  .header {
+    background-color: var(--color-bg-primary);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: var(--z-dropdown);
+    transition: all var(--transition-normal);
+  }
+  
+  .header__nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-md);
+  }
+  
+  .header__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4rem;
+  }
+  
+  .header__title {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+  }
+  
+  .header__logo {
+    color: var(--color-text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
+  }
+  
+  .header__logo:hover {
+    opacity: 0.8;
+  }
+  
+  .header__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+  
+  .theme-icon {
+    display: inline-block;
+    font-size: 1.25rem;
+    transition: transform var(--transition-fast);
+  }
+  
+  .header__controls button:hover .theme-icon {
+    transform: rotate(20deg);
+  }
+  
+  @media (max-width: 768px) {
+    .header__content {
+      height: 3.5rem;
+    }
+    
+    .header__title {
+      font-size: var(--font-size-lg);
+    }
+  }
+</style>

@@ -1,0 +1,9 @@
+/**
+ * IMPORTAR TODOS LOS ESTILOS GLOBALES
+ * 
+ * Este archivo es la entrada principal para CSS
+ * Incluye en el layout global
+ */
+
+@import './tokens.css';
+@import './components.css';

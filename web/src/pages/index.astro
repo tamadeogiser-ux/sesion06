@@ -1,0 +1,264 @@
+---
+/**
+ * Página Principal
+ * 
+ * Muestra:
+ * - Búsqueda de ubicación
+ * - Clima actual prominente
+ * - Pronóstico de 7 días
+ * - Alertas si las hay
+ */
+
+import Layout from '../layouts/Layout.astro';
+import LocationSearch from '../components/LocationSearch.astro';
+import CurrentWeather from '../components/CurrentWeather.astro';
+import ForecastCard from '../components/ForecastCard.astro';
+import AlertBanner from '../components/AlertBanner.astro';
+import HourlyForecast from '../components/HourlyForecast.astro';
+import { formatWeatherData, generateFallbackData } from '../utils/weatherMapper';
+
+// Datos por defecto (Valencia Mock Fallback)
+const VALENCIA_COORDS = { lat: 39.4699, lon: -0.376 };
+let weatherData = generateFallbackData();
+
+// Intento de obtener datos reales del servidor local
+try {
+  const response = await fetch(`http://localhost:3000/api/weather?lat=${VALENCIA_COORDS.lat}&lon=${VALENCIA_COORDS.lon}&city=Valencia`);
+  if (response.ok) {
+    const result = await response.json();
+    if (result.success && result.data) {
+       // Mapear respuesta del backend al formato del frontend
+       weatherData = formatWeatherData(result.data);
+    }
+  }
+} catch (e) {
+  console.error('Error fetching Valencia weather:', e);
+  // Se mantiene el mock
+}
+---
+
+<Layout 
+  title="Valencia - Clima"
+  description="Información meteorológica de Valencia en tiempo real"
+>
+  <!-- Búsqueda (Deshabilitada: Solo Valencia) -->
+  <section class="hero">
+    <div class="hero__content">
+      <h1 class="hero__title">Tiempo en Valencia 🍊</h1>
+      <p class="hero__subtitle">Datos meteorológicos en tiempo real</p>
+      <!-- <LocationSearch placeholder="Busca una ciudad..." /> -->
+    </div>
+  </section>
+
+  <!-- Alertas -->
+  <section class="alerts-section">
+    {weatherData.alerts && weatherData.alerts.length > 0 ? (
+      weatherData.alerts.map((alert: any) => (
+        <AlertBanner
+          type={alert.severity === 'critical' ? 'error' : 'warning'}
+          title={alert.type === 'HIGH_WIND' ? 'Viento Fuerte' : 
+                 alert.type === 'HEAVY_RAIN' ? 'Lluvia Intensa' : 
+                 alert.type === 'EXTREME_HEAT' ? 'Calor Extremo' : 
+                 'Alerta Meteorológica'}
+          message={alert.message}
+          dismissible={true}
+        />
+      ))
+    ) : (
+      <AlertBanner
+        type="success"
+        title="Sin riesgos"
+        message="No hay alertas activas en este momento."
+        dismissible={false}
+      />
+    )}
+  </section>
+
+  <!-- Clima Actual -->
+  <section class="current-section">
+    <CurrentWeather
+      temperature={weatherData.current.temperature}
+      description={weatherData.current.description}
+      humidity={weatherData.current.humidity}
+      windSpeed={weatherData.current.windSpeed}
+      feelsLike={weatherData.current.feelsLike}
+    />
+  </section>
+
+  <!-- Pronóstico por Horas -->
+  <section class="hourly-section">
+    <h3>Próximas 24 Horas</h3>
+    <div class="hourly-scroller">
+      {weatherData.hourly && weatherData.hourly.map((hour: any) => (
+        <HourlyForecast
+          time={hour.time}
+          temperature={hour.temperature}
+          precipitation={hour.precipitation}
+          description={hour.description}
+        />
+      ))}
+    </div>
+  </section>
+
+  <!-- Pronóstico -->
+  <section class="forecast-section">
+    <div class="section-header">
+      <h2>Pronóstico de 7 días</h2>
+      <p class="section-subtitle">Perspectiva completa del tiempo</p>
+    </div>
+    
+    <div class="forecast-grid">
+      {weatherData.forecast.map((day: any) => (
+        <ForecastCard
+          date={day.date}
+          tempMax={day.tempMax}
+          tempMin={day.tempMin}
+          precipitation={day.precipitation}
+          description={day.description}
+        />
+      ))}
+    </div>
+  </section>
+
+  <!-- Info Adicional -->
+  <section class="info-section">
+    <div class="info-grid">
+      <div class="info-card">
+        <h3 class="info-card__title">Consejos</h3>
+        <ul class="info-card__list">
+          <li>✅ Buen día para actividades al aire libre</li>
+          <li>☂️ Recuerda llevar paraguas mañana</li>
+          <li>👕 Vistete en capas para cambios de temperatura</li>
+        </ul>
+      </div>
+      
+      <div class="info-card">
+        <h3 class="info-card__title">Fuentes</h3>
+        <p>Datos meteorológicos proporcionados por Open-Meteo, una API pública gratuita.</p>
+        <a href="https://open-meteo.com/" target="_blank" rel="noopener">Visitar Open-Meteo →</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    margin-bottom: var(--space-3xl);
+  }
+  
+  .hero__content {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+  }
+  
+  .hero__title {
+    margin-bottom: var(--space-md);
+    color: var(--color-text-primary);
+  }
+  
+  .hero__subtitle {
+    margin-bottom: var(--space-lg);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+  }
+  
+  .hero :global(> *) {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .alerts-section {
+    margin-bottom: var(--space-2xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  
+  .current-section {
+    margin-bottom: var(--space-2xl);
+  }
+  
+  .forecast-section {
+    margin-bottom: var(--space-3xl);
+  }
+  
+  .section-header {
+    margin-bottom: var(--space-lg);
+  }
+  
+  .section-header h2 {
+    margin-bottom: var(--space-xs);
+    color: var(--color-text-primary);
+  }
+  
+  .section-subtitle {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-base);
+  }
+  
+  .forecast-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-md);
+  }
+  
+  .info-section {
+    padding: var(--space-xl);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-xl);
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+  }
+  
+  .info-card {
+    padding: var(--space-lg);
+    background-color: var(--color-bg-primary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+  }
+  
+  .info-card__title {
+    margin-top: 0;
+    margin-bottom: var(--space-md);
+    color: var(--color-text-primary);
+  }
+  
+  .info-card__list {
+    margin: 0;
+    padding-left: var(--space-lg);
+    color: var(--color-text-secondary);
+  }
+  
+  .info-card__list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .info-card p {
+    margin: 0 0 var(--space-md);
+    line-height: var(--line-height-relaxed);
+  }
+  
+  .info-card a {
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  @media (max-width: 768px) {
+    .hero {
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .forecast-grid {
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: var(--space-sm);
+    }
+    
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

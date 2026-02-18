@@ -1,0 +1,131 @@
+---
+/**
+ * Componente AlertBanner
+ * 
+ * Mostrar alertas meteorológicas
+ * - Diferentes niveles de severidad
+ * - Iconografía clara
+ * - Desplegable
+ */
+
+interface Props {
+  type: 'info' | 'success' | 'warning' | 'error';
+  title: string;
+  message: string;
+  icon?: string;
+  dismissible?: boolean;
+}
+
+const { type = 'info', title, message, icon, dismissible = false } = Astro.props;
+
+const icons: Record<string, string> = {
+  info: 'ℹ️',
+  success: '✅',
+  warning: '⚠️',
+  error: '❌',
+};
+
+const typeIcon = icon || icons[type];
+---
+
+<div class={`alert alert-${type}`} role="alert">
+  <span class="alert__icon" aria-hidden="true">{typeIcon}</span>
+  
+  <div class="alert__content">
+    <h4 class="alert__title">{title}</h4>
+    <p class="alert__message">{message}</p>
+  </div>
+  
+  {dismissible && (
+    <button 
+      class="alert__close"
+      aria-label={`Cerrar alerta: ${title}`}
+      onclick="this.parentElement.style.display='none'"
+    >
+      ✕
+    </button>
+  )}
+</div>
+
+<style>
+  .alert {
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    border-left: 4px solid;
+    display: flex;
+    gap: var(--space-md);
+    align-items: flex-start;
+    animation: slideDown 300ms ease-out;
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .alert__icon {
+    font-size: 1.5rem;
+    min-width: 1.5rem;
+    text-align: center;
+  }
+  
+  .alert__content {
+    flex: 1;
+  }
+  
+  .alert__title {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  .alert__message {
+    margin: var(--space-xs) 0 0;
+    font-size: var(--font-size-sm);
+  }
+  
+  .alert__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: var(--font-size-lg);
+    opacity: 0.6;
+    transition: opacity var(--transition-fast);
+    min-width: 24px;
+    height: 24px;
+  }
+  
+  .alert__close:hover {
+    opacity: 1;
+  }
+  
+  .alert-info {
+    background-color: rgba(14, 165, 233, 0.05);
+    border-color: var(--color-info);
+    color: var(--color-info);
+  }
+  
+  .alert-success {
+    background-color: rgba(34, 197, 94, 0.05);
+    border-color: var(--color-success);
+    color: var(--color-success);
+  }
+  
+  .alert-warning {
+    background-color: rgba(234, 179, 8, 0.05);
+    border-color: var(--color-warning);
+    color: var(--color-warning);
+  }
+  
+  .alert-error {
+    background-color: rgba(239, 68, 68, 0.05);
+    border-color: var(--color-error);
+    color: var(--color-error);
+  }
+</style>
